@@ -190,14 +190,15 @@ void D_DrawParticle (particle_t *pparticle)
 
 		for ( ; count ; count--, pz += d_zwidth, pdest += screenwidth)
 		{
-			for (i=0 ; i<pix ; i++)
+			i = 0;
+			do
 			{
 				if (pz[i] <= izi)
 				{
 					pz[i] = izi;
 					pdest[i] = pparticle->color;
 				}
-			}
+			} while(++i < pix);
 		}
 		break;
 	}

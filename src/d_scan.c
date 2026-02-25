@@ -361,12 +361,25 @@ void D_DrawSpans8 (espan_t *pspan)
 				}
 			}
 
-			do
+			/*do
 			{
 				*pdest++ = *(pbase + (s >> 16) + (t >> 16) * cachewidth);
 				s += sstep;
 				t += tstep;
-			} while (--spancount);
+			} while (--spancount);*/
+
+			switch(spancount)
+			{
+				default: __builtin_unreachable();
+				case 8: *pdest++ = *(pbase + (s >> 16) + (t >> 16) * cachewidth); s += sstep; t += tstep;
+				case 7: *pdest++ = *(pbase + (s >> 16) + (t >> 16) * cachewidth); s += sstep; t += tstep;
+				case 6: *pdest++ = *(pbase + (s >> 16) + (t >> 16) * cachewidth); s += sstep; t += tstep;
+				case 5: *pdest++ = *(pbase + (s >> 16) + (t >> 16) * cachewidth); s += sstep; t += tstep;
+				case 4: *pdest++ = *(pbase + (s >> 16) + (t >> 16) * cachewidth); s += sstep; t += tstep;
+				case 3: *pdest++ = *(pbase + (s >> 16) + (t >> 16) * cachewidth); s += sstep; t += tstep;
+				case 2: *pdest++ = *(pbase + (s >> 16) + (t >> 16) * cachewidth); s += sstep; t += tstep;
+				case 1: *pdest++ = *(pbase + (s >> 16) + (t >> 16) * cachewidth);
+			}
 
 			s = snext;
 			t = tnext;

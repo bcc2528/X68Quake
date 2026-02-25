@@ -165,19 +165,10 @@ int RecursiveLightPoint (mnode_t *node, vec3_t start, vec3_t end)
 	plane = node->plane;
 	front = DotProduct (start, plane->normal) - plane->dist;
 	back = DotProduct (end, plane->normal) - plane->dist;
-
-	if(front < 0)
-	{
-		if (back < 0)
-			return RecursiveLightPoint (node->children[1], start, end);
-		side = 1;
-	}
-	else
-	{
-		if(!(back < 0))
-			return RecursiveLightPoint (node->children[0], start, end);
-		side = 0;
-	}
+	side = front < 0;
+	
+	if ( (back < 0) == side)
+		return RecursiveLightPoint (node->children[side], start, end);
 	
 	frac = front / (front-back);
 	mid[0] = start[0] + (end[0] - start[0])*frac;

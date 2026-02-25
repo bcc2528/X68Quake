@@ -79,7 +79,7 @@ qboolean VID_AllocBuffers (int width, int height)
 	tbuffersize = (width * height) +
 			(width * height * sizeof (*d_pzbuffer));
 
-	tsize = D_SurfaceCacheForRes (400, 300);
+	tsize = D_SurfaceCacheForRes (width, height);
 
 	tbuffersize += tsize;
 

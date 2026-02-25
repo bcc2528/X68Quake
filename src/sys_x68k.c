@@ -267,7 +267,7 @@ int main(int argc, char *argv[])
 
 	static quakeparms_t    parms;
 
-	parms.memsize = 9*1024*1024;
+	parms.memsize = 8*1024*1024;
 	parms.membase = malloc (parms.memsize);
 	if(parms.membase == NULL)
 	{

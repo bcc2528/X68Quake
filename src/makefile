@@ -20,8 +20,8 @@ CC = ${XDEV68K_DIR}/m68k-toolchain/bin/m68k-elf-gcc
 GAS2HAS = perl ${XDEV68K_DIR}/util/x68k_gas2has.pl -cpu $(CPU) -inc doscall.inc -inc iocscall.inc
 RUN68 = $(ATOMIC) ${XDEV68K_DIR}/run68/run68
 HAS = $(RUN68) ${XDEV68K_DIR}/x68k_bin/HAS060.X
-# ヒープサイズを9MB、スタックサイズを256KB確保
-HLK = $(RUN68) ${XDEV68K_DIR}/x68k_bin/hlk301.x -d _HEAP_SIZE=a00000 -d _STACK_SIZE=40000
+# ヒープサイズを8.5MB、スタックサイズを256KB確保
+HLK = $(RUN68) ${XDEV68K_DIR}/x68k_bin/hlk301.x -d _HEAP_SIZE=880000 -d _STACK_SIZE=40000
 
 # 最終生成物
 EXECUTABLE = X68QUAKE.X

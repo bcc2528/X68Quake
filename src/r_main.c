@@ -633,7 +633,7 @@ void R_DrawViewModel (void)
 		radius_sq = dl->radius * dl->radius;
 		if (dist_sq < radius_sq)
 		{
-			add = radius_sq - sqrt(dist_sq);
+			add = dl->radius - sqrt(dist_sq);
 			r_viewlighting.ambientlight += add;
 		}
 	}

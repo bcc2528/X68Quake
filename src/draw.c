@@ -170,7 +170,7 @@ void Draw_Character (int x, int y, int num)
 
 	dest = vid.conbuffer + y*vid.conrowbytes + x;
 	
-	while (drawline--)
+	do
 	{
 		if (source[0])
 			dest[0] = source[0];
@@ -190,7 +190,7 @@ void Draw_Character (int x, int y, int num)
 			dest[7] = source[7];
 		source += 128;
 		dest += vid.conrowbytes;
-	}
+	} while(--drawline);
 }
 
 /*
