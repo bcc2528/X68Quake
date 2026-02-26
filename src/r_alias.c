@@ -204,7 +204,8 @@ qboolean R_AliasCheckBBox (void)
 	allclip = ALIAS_XY_CLIP_MASK;
 
 // TODO: probably should do this loop in ASM, especially if we use floats
-	for (i=0 ; i<numv ; i++)
+	i = 0;
+	do
 	{
 	// we don't need to bother with vertices that were z-clipped
 		if (viewpts[i].flags & ALIAS_Z_CLIP)
@@ -234,7 +235,7 @@ qboolean R_AliasCheckBBox (void)
 
 		anyclip |= flags;
 		allclip &= flags;
-	}
+	} while(++i < numv);
 
 	if (allclip)
 		return false;	// trivial reject off one side
@@ -409,13 +410,18 @@ void R_AliasSetUpTransform (int trivial_accept)
 	{
 		float	temp_x = aliasxscale * (1.0 / ((float)0x8000 * 0x10000));
 		float	temp_y = aliasyscale * (1.0 / ((float)0x8000 * 0x10000));
-		for (i=0 ; i<4 ; i++)
-		{
-			aliastransform[0][i] *= temp_x;
-			aliastransform[1][i] *= temp_y;
-			aliastransform[2][i] *= 1.0 / ((float)0x8000 * 0x10000);
-
-		}
+		aliastransform[0][0] *= temp_x;
+		aliastransform[0][1] *= temp_x;
+		aliastransform[0][2] *= temp_x;
+		aliastransform[0][3] *= temp_x;
+		aliastransform[1][0] *= temp_y;
+		aliastransform[1][1] *= temp_y;
+		aliastransform[1][2] *= temp_y;
+		aliastransform[1][3] *= temp_y;
+		aliastransform[2][0] *= 1.0 / ((float)0x8000 * 0x10000);
+		aliastransform[2][1] *= 1.0 / ((float)0x8000 * 0x10000);
+		aliastransform[2][2] *= 1.0 / ((float)0x8000 * 0x10000);
+		aliastransform[2][3] *= 1.0 / ((float)0x8000 * 0x10000);
 	}
 }
 

@@ -49,9 +49,9 @@ static int	vid_highhunkmark;
 
 void	VID_SetPalette (unsigned char *palette)
 {
-	unsigned short r, g, b;
+	unsigned char r, g, b;
 
-	register int i = 0;
+	int i = 0;
 	do
 	{
 		r = (*palette++) & 0xf8;
@@ -202,6 +202,11 @@ void	VID_Update (vrect_t *rects)
 	int x, y;
 	short *dest;
 	char *src;
+	union reg
+	{
+		unsigned char b[2];
+		unsigned short w;
+	} pix;
 
 	dest = gvram[page];
 	src = (char *)vid.buffer;
@@ -210,7 +215,8 @@ void	VID_Update (vrect_t *rects)
 	{
 		for(x = 0;x < BASEWIDTH;x++)
 		{
-			*dest++ = *src++;
+			pix.b[1] = *src++;
+			*dest++ = pix.w;
 		}
 		dest += GVRAMWIDTH - BASEWIDTH;
 	}
