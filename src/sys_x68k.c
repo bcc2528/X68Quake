@@ -264,6 +264,24 @@ int main(int argc, char *argv[])
 	int running;
 	double oldtime, newtime;
 
+	int ssp = B_SUPER(0);
+
+	__asm__ volatile(
+		"cpusha %%ic\n\t"		// flush+invalidate (real HW)
+		"movec  %%cacr,%%d0\n\t"	// read CACR
+		"move.l d0,d1\n\t"		// copy original CACR
+		"andi.l #0xFFFF7FFF,%%d1\n\t"	// clear EIC (bit 15)
+		"movec  %%d1,%%cacr\n\t"	// disable I-cache
+		"movec  %%d0,%%cacr"		// re-enable: cache now empty
+		: : : "d0", "cc"
+	);
+
+        __asm__ volatile ("subq.l #8,sp\n"
+                          "move.l sp,usp\n"
+                          "addq.l #4,sp\n"
+                          "move.l %0,(sp)\n"
+                          "jsr (%1)\n"
+                          "addq.l #4,sp" :: "d"(ssp), "a"(B_SUPER));
 
 	static quakeparms_t    parms;
 
@@ -283,7 +301,6 @@ int main(int argc, char *argv[])
 
 	printf ("Host_Init\n");
 	Host_Init (&parms);
-
 
 	running = 1;
 	oldtime = 0.1;

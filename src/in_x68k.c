@@ -17,7 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-// in_null.c -- for systems without a mouse
+// in_x68k.c -- for X68000 Input interface (Keyboard & Mouse)
 
 #pragma GCC push_options
 #pragma GCC optimize ("O1")
@@ -67,9 +67,9 @@ byte	scantokey[128] = {	0,K_ESCAPE,'1','2','3','4','5','6',	  				/* 00Å`07 */
 				':',']','z','x','c','v','b','n',	  				/* 28Å`2F */
 				'm',',','.','/','_',K_SPACE,K_HOME,K_DEL,				/* 30Å`37 */
 				K_PGUP,K_PGDN,0,K_LEFTARROW,K_UPARROW,K_RIGHTARROW,K_DOWNARROW,0,	/* 38Å`3F */
-				0,0,0,0,0,0,0,0,							/* 40Å`47 */
-				0,0,0,0,0,0,0,0,							/* 48Å`4F */
-				0,0,0,0,0,0,0,0,							/* 50Å`57 */
+				'/','*','-','7','8','9','+','4',							/* 40Å`47 */
+				'5','6','=','1','2','3',K_ENTER,'0',							/* 48Å`4F */
+				',','.',0,0,0,0,0,0,							/* 50Å`57 */
 				0,0,0,0,0,0,K_INS,0,							/* 58Å`5F */
 				0,0,0,K_F1,K_F2,K_F3,K_F4,K_F5,	  					/* 60Å`67 */
 				K_F6,K_F7,K_F8,K_F9,K_F10,0,0,0,	  				/* 68Å`6F */
@@ -77,7 +77,7 @@ byte	scantokey[128] = {	0,K_ESCAPE,'1','2','3','4','5','6',	  				/* 00Å`07 */
 				0,0,0,0,0,0,0,0		  						/* 78Å`7F */
 };
 
-static byte oldkeystate[128];
+static byte oldkeystate[120];
 
 
 void Joy_AdvancedUpdate_f (void);
@@ -104,7 +104,7 @@ void IN_Init (void)
 
 	Cmd_AddCommand ("joyadvancedupdate", Joy_AdvancedUpdate_f);
 
-	memset(oldkeystate, 0, 128);
+	memset(oldkeystate, 0, 120);
 
 	joy_advancedinit = false;
 }
@@ -115,22 +115,22 @@ void IN_Shutdown (void)
 
 void IN_Commands (void)
 {
-	unsigned char tempkey[128];
+	unsigned char tempkey[120];
 	register byte i, key;
 // get key events
 	i = 0;
 	do
 	{
 		key = BITSNS(i);
-		tempkey[(i * 8)    ] = (key & 1) ? true : false;
-		tempkey[(i * 8) + 1] = (key & 2) ? true : false;
-		tempkey[(i * 8) + 2] = (key & 4) ? true : false;
-		tempkey[(i * 8) + 3] = (key & 8) ? true : false;
-		tempkey[(i * 8) + 4] = (key &16) ? true : false;
-		tempkey[(i * 8) + 5] = (key &32) ? true : false;
-		tempkey[(i * 8) + 6] = (key &64) ? true : false;
-		tempkey[(i * 8) + 7] = (key&128) ? true : false;
-	} while(++i < 16);
+		tempkey[(i * 8)    ] = (key & 1);
+		tempkey[(i * 8) + 1] = (key & 2);
+		tempkey[(i * 8) + 2] = (key & 4);
+		tempkey[(i * 8) + 3] = (key & 8);
+		tempkey[(i * 8) + 4] = (key &16);
+		tempkey[(i * 8) + 5] = (key &32);
+		tempkey[(i * 8) + 6] = (key &64);
+		tempkey[(i * 8) + 7] = (key&128);
+	} while(++i < 15);
 
 	i = 0;
 	do
@@ -139,9 +139,9 @@ void IN_Commands (void)
 		{
 			Key_Event(scantokey[i],tempkey[i]);
 		}
-	} while(++i < 128);
+	} while(++i < 120);
 
-	memcpy(oldkeystate,tempkey,128);
+	memcpy(oldkeystate,tempkey,120);
 }
 
 void IN_MouseMove (usercmd_t *cmd)
