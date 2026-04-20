@@ -597,6 +597,7 @@ void D_PolysetDrawSpans8 (spanpackage_t *pspanpackage)
 	int		lsfrac, ltfrac;
 	int		llight;
 	int		lzi;
+	const int		skinwidth = r_affinetridesc.skinwidth;
 	short	*lpz;
 
 	do
@@ -643,7 +644,7 @@ void D_PolysetDrawSpans8 (spanpackage_t *pspanpackage)
 				ltfrac += a_tstepxfrac;
 				if (ltfrac & 0x10000)
 				{
-					lptex += r_affinetridesc.skinwidth;
+					lptex += skinwidth;
 					ltfrac &= 0xFFFF;
 				}
 			} while (--lcount);

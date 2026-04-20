@@ -142,6 +142,7 @@ void Draw_Character (int x, int y, int num)
 	unsigned short	*pusdest;
 	int				drawline;	
 	int				row, col;
+	const int rowbytes = vid.conrowbytes;
 
 	num &= 255;
 	
@@ -168,7 +169,7 @@ void Draw_Character (int x, int y, int num)
 	else
 		drawline = 8;
 
-	dest = vid.conbuffer + y*vid.conrowbytes + x;
+	dest = vid.conbuffer + y * rowbytes + x;
 	
 	do
 	{
@@ -189,7 +190,7 @@ void Draw_Character (int x, int y, int num)
 		if (source[7])
 			dest[7] = source[7];
 		source += 128;
-		dest += vid.conrowbytes;
+		dest += rowbytes;
 	} while(--drawline);
 }
 
@@ -261,9 +262,11 @@ void Draw_Pic (int x, int y, qpic_t *pic)
 	byte			*dest, *source;
 	unsigned short	*pusdest;
 	int				v, u;
+	const int rowbytes = vid.rowbytes;
+	const int width = pic->width;
 
 	if ((x < 0) ||
-		(x + pic->width > vid.width) ||
+		(x + width > vid.width) ||
 		(y < 0) ||
 		(y + pic->height > vid.height))
 	{
@@ -272,13 +275,13 @@ void Draw_Pic (int x, int y, qpic_t *pic)
 
 	source = pic->data;
 
-	dest = vid.buffer + y * vid.rowbytes + x;
+	dest = vid.buffer + y * rowbytes + x;
 
 	for (v=0 ; v<pic->height ; v++)
 	{
-			Q_memcpy (dest, source, pic->width);
-			dest += vid.rowbytes;
-			source += pic->width;
+			Q_memcpy (dest, source, width);
+			dest += rowbytes;
+			source += width;
 	}
 }
 
@@ -293,8 +296,10 @@ void Draw_TransPic (int x, int y, qpic_t *pic)
 	byte	*dest, *source, tbyte;
 	unsigned short	*pusdest;
 	int				v, u;
+	const int rowbytes = vid.rowbytes;
+	const int width = pic->width;
 
-	if (x < 0 || (unsigned)(x + pic->width) > vid.width || y < 0 ||
+	if (x < 0 || (unsigned)(x + width) > vid.width || y < 0 ||
 		 (unsigned)(y + pic->height) > vid.height)
 	{
 		Sys_Error ("Draw_TransPic: bad coordinates");
@@ -302,25 +307,25 @@ void Draw_TransPic (int x, int y, qpic_t *pic)
 		
 	source = pic->data;
 
-	dest = vid.buffer + y * vid.rowbytes + x;
+	dest = vid.buffer + y * rowbytes + x;
 
-	if (pic->width & 7)
+	if (width & 7)
 	{	// general
 		for (v=0 ; v<pic->height ; v++)
 		{
-			for (u=0 ; u<pic->width ; u++)
+			for (u=0 ; u<width ; u++)
 				if ( (tbyte=source[u]) != TRANSPARENT_COLOR)
 					dest[u] = tbyte;
 
-			dest += vid.rowbytes;
-			source += pic->width;
+			dest += rowbytes;
+			source += width;
 		}
 	}
 	else
 	{	// unwound
 		for (v=0 ; v<pic->height ; v++)
 		{
-			for (u=0 ; u<pic->width ; u+=8)
+			for (u=0 ; u<width ; u+=8)
 			{
 				if ( (tbyte=source[u]) != TRANSPARENT_COLOR)
 					dest[u] = tbyte;
@@ -339,8 +344,8 @@ void Draw_TransPic (int x, int y, qpic_t *pic)
 				if ( (tbyte=source[u+7]) != TRANSPARENT_COLOR)
 					dest[u+7] = tbyte;
 			}
-			dest += vid.rowbytes;
-			source += pic->width;
+			dest += rowbytes;
+			source += width;
 		}
 	}
 
@@ -357,8 +362,10 @@ void Draw_TransPicTranslate (int x, int y, qpic_t *pic, byte *translation)
 	byte	*dest, *source, tbyte;
 	unsigned short	*pusdest;
 	int				v, u;
+	const int rowbytes = vid.rowbytes;
+	const int width = pic->width;
 
-	if (x < 0 || (unsigned)(x + pic->width) > vid.width || y < 0 ||
+	if (x < 0 || (unsigned)(x + width) > vid.width || y < 0 ||
 		 (unsigned)(y + pic->height) > vid.height)
 	{
 		Sys_Error ("Draw_TransPic: bad coordinates");
@@ -368,23 +375,23 @@ void Draw_TransPicTranslate (int x, int y, qpic_t *pic, byte *translation)
 
 	dest = vid.buffer + y * vid.rowbytes + x;
 
-	if (pic->width & 7)
+	if (width & 7)
 	{	// general
 		for (v=0 ; v<pic->height ; v++)
 		{
-			for (u=0 ; u<pic->width ; u++)
+			for (u=0 ; u<width ; u++)
 				if ( (tbyte=source[u]) != TRANSPARENT_COLOR)
 					dest[u] = translation[tbyte];
 
-			dest += vid.rowbytes;
-			source += pic->width;
+			dest += rowbytes;
+			source += width;
 		}
 	}
 	else
 	{	// unwound
 		for (v=0 ; v<pic->height ; v++)
 		{
-			for (u=0 ; u<pic->width ; u+=8)
+			for (u=0 ; u<width ; u+=8)
 			{
 				if ( (tbyte=source[u]) != TRANSPARENT_COLOR)
 					dest[u] = translation[tbyte];
@@ -403,8 +410,8 @@ void Draw_TransPicTranslate (int x, int y, qpic_t *pic, byte *translation)
 				if ( (tbyte=source[u+7]) != TRANSPARENT_COLOR)
 					dest[u+7] = translation[tbyte];
 			}
-			dest += vid.rowbytes;
-			source += pic->width;
+			dest += rowbytes;
+			source += width;
 		}
 	}
 }
