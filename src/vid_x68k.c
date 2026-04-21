@@ -27,7 +27,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "x68quake.h"
 #include "vid_x68k.h"
-#include "himem.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -189,8 +188,6 @@ void	VID_Shutdown (void)
 
 	CRTMOD(crt_mode);
 	C_CURON();
-
-	himem_free(d_pzbuffer);
 
         __asm__ volatile ("subq.l #8,sp\n"
                           "move.l sp,usp\n"
