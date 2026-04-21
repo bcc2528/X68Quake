@@ -24,12 +24,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 #include "x68quake.h"
+#include "himem.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <iocslib.h>
 #include <doslib.h>
+
+static quakeparms_t    parms;
 
 static int ssp;
 static int crt_mode;
@@ -247,6 +250,8 @@ void X68K_Init(void)
 	}
 
 	TimerDSet = true;
+
+	SKEY_MOD(0, 0, 0);
 }
 
 void X68K_Quit(void)
@@ -255,6 +260,10 @@ void X68K_Quit(void)
 	{
 		TIMERDST(0, 0, 0);
 	}
+
+	himem_free(parms.membase);
+
+	SKEY_MOD(-1, 0, 0);
 
 	KFLUSHIO(0xff); // Key Buffer Clear
 }
@@ -283,21 +292,33 @@ int main(int argc, char *argv[])
                           "jsr (%1)\n"
                           "addq.l #4,sp" :: "d"(ssp), "a"(B_SUPER));
 
-	static quakeparms_t    parms;
-
-	parms.memsize = 8*1024*1024;
-	parms.membase = malloc (parms.memsize);
-	if(parms.membase == NULL)
-	{
-		printf("Quake for X68000 is requirement Free memory 10MB\n");
-		return 1;
-	}
 	parms.basedir = ".";
 
 	COM_InitArgv (argc, argv);
 
 	parms.argc = com_argc;
 	parms.argv = com_argv;
+
+	int i = COM_CheckParm("-mem");
+	if (i)
+	{
+		parms.memsize = (int) (Q_atof(com_argv[i + 1]) * 1024 * 1024);
+	}
+	else
+	{
+		parms.memsize = 8*1024*1024;
+	}
+	if(parms.memsize > himem_getsize())
+	{
+		printf("Failed to allocate heap memory on the HIMEM.\n");
+		return 1;
+	}
+	parms.membase = himem_malloc (parms.memsize);
+	if(parms.membase == NULL)
+	{
+		printf("Failed to allocate heap memory on the HIMEM.\n");
+		return 1;
+	}
 
 	printf ("Host_Init\n");
 	Host_Init (&parms);

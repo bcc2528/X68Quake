@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "x68quake.h"
 #include "vid_x68k.h"
+#include "himem.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -189,6 +190,8 @@ void	VID_Shutdown (void)
 	CRTMOD(crt_mode);
 	C_CURON();
 
+	himem_free(d_pzbuffer);
+
         __asm__ volatile ("subq.l #8,sp\n"
                           "move.l sp,usp\n"
                           "addq.l #4,sp\n"
@@ -201,22 +204,29 @@ void	VID_Update (vrect_t *rects)
 {
 	int x, y;
 	short *dest;
-	char *src;
-	union reg
-	{
-		unsigned char b[2];
-		unsigned short w;
-	} pix;
+	short *src;
+	short pix;
 
 	dest = gvram[page];
-	src = (char *)vid.buffer;
+	src = (short *)vid.buffer;
 
 	for(y = 0;y < BASEHEIGHT;y++)
 	{
-		for(x = 0;x < BASEWIDTH;x++)
+		for(x = 0;x < (BASEWIDTH / 8);x++)
 		{
-			pix.b[1] = *src++;
-			*dest++ = pix.w;
+			pix = *src++;
+			dest[1] = pix;
+			dest[0] = pix >> 8;
+			pix = *src++;
+			dest[3] = pix;
+			dest[2] = pix >> 8;
+			pix = *src++;
+			dest[5] = pix;
+			dest[4] = pix >> 8;
+			pix = *src++;
+			dest[7] = pix;
+			dest[6] = pix >> 8;
+			dest += 8;
 		}
 		dest += GVRAMWIDTH - BASEWIDTH;
 	}
