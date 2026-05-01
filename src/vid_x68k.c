@@ -201,7 +201,7 @@ void	VID_Update (vrect_t *rects)
 {
 	int x, y;
 	short *dest;
-	short *src;
+/*	short *src;
 	short pix;
 
 	dest = gvram[page];
@@ -223,6 +223,43 @@ void	VID_Update (vrect_t *rects)
 			pix = *src++;
 			dest[7] = pix;
 			dest[6] = pix >> 8;
+			dest += 8;
+		}
+		dest += GVRAMWIDTH - BASEWIDTH;
+	}*/
+
+	int *src;
+	int pix;
+
+	dest = gvram[page];
+	src = (int *)vid.buffer;
+
+	#define Shift_Template \
+	__asm__ volatile( \
+	"asr.l #8,%0\n": "=r"(pix) \
+	: "r"(pix) \
+	: "cc", "memory"); \
+
+	for(y = 0;y < BASEHEIGHT;y++)
+	{
+		for(x = 0;x < (BASEWIDTH / 8);x++)
+		{
+			pix = *src++;
+			dest[3] = pix;
+			Shift_Template;
+			dest[2] = pix;
+			Shift_Template;
+			dest[1] = pix;
+			Shift_Template;
+			dest[0] = pix;
+			pix = *src++;
+			dest[7] = pix;
+			Shift_Template;
+			dest[6] = pix;
+			Shift_Template;
+			dest[5] = pix;
+			Shift_Template;
+			dest[4] = pix;
 			dest += 8;
 		}
 		dest += GVRAMWIDTH - BASEWIDTH;
