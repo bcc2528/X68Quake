@@ -77,12 +77,15 @@ void D_WarpScreen (void)
 	turb = intsintable + ((int)(cl.time*SPEED)&(CYCLE-1));
 	dest = vid.buffer + scr_vrect.y * vid.rowbytes + scr_vrect.x;
 
-	for (v=0 ; v<scr_vrect.height ; v++, dest += vid.rowbytes)
+	w = scr_vrect.width;
+	h = scr_vrect.height;
+
+	for (v=0 ; v<h ; v++, dest += vid.rowbytes)
 	{
 		col = &column[turb[v]];
 		row = &rowptr[v];
 
-		for (u=0 ; u<scr_vrect.width ; u+=4)
+		for (u=0 ; u<w ; u+=4)
 		{
 			dest[u+0] = row[turb[u+0]][col[u+0]];
 			dest[u+1] = row[turb[u+1]][col[u+1]];
@@ -413,6 +416,12 @@ void D_DrawZSpans (espan_t *pspan)
 // we count on FP exceptions being turned off to avoid range problems
 	izistep = (int)(d_zistepu * 0x8000 * 0x10000);
 
+	unsigned int shift_16; //shift_16 = 16
+	__asm__ volatile(
+		"moveq   #16, %0\n": "=r"(shift_16)
+		: "r"(shift_16)
+		: "cc", "memory");
+
 	do
 	{
 		pdest = d_pzbuffer + (d_zwidth * pspan->v) + pspan->u;
@@ -429,7 +438,7 @@ void D_DrawZSpans (espan_t *pspan)
 
 		if ((intptr_t)pdest & 0x02)
 		{
-			*pdest++ = (short)(izi >> 16);
+			*pdest++ = (short)(izi >> shift_16);
 			izi += izistep;
 			count--;
 		}
@@ -438,7 +447,7 @@ void D_DrawZSpans (espan_t *pspan)
 		{
 			do
 			{
-				ltemp = izi >> 16;
+				ltemp = izi >> shift_16;
 				izi += izistep;
 				ltemp |= izi & 0xFFFF0000;
 				izi += izistep;
@@ -448,7 +457,7 @@ void D_DrawZSpans (espan_t *pspan)
 		}
 
 		if (count & 1)
-			*pdest = (short)(izi >> 16);
+			*pdest = (short)(izi >> shift_16);
 
 	} while ((pspan = pspan->pnext) != NULL);
 }
